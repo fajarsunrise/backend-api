@@ -6,6 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\AuthService;
 
+/**
+ * @group Otentikasi
+ *
+ * Endpoint untuk pendaftaran dan login pengguna (Sanctum).
+ */
+
 class AuthController extends Controller
 {
     protected $authService;
