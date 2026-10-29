@@ -4,50 +4,51 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
+use App\Services\AuthService;
 
 class AuthController extends Controller
 {
-    // Fungsi untuk mendaftarkan user baru
+    protected $authService;
+
+    public function __construct(AuthService $authService)
+    {
+        $this->authService = $authService;
+    }
+
     public function register(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8'
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password)
-        ]);
-
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $result = $this->authService->registerUser($validated);
 
         return response()->json([
             'message' => 'Registrasi berhasil',
-            'data' => $user,
-            'access_token' => $token,
+            'data' => $result['user'],
+            'access_token' => $result['token'],
             'token_type' => 'Bearer'
-        ]);
+        ], 201);
     }
 
-    // Fungsi untuk login user yang sudah ada
     public function login(Request $request)
     {
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
+
+        $result = $this->authService->loginUser($credentials);
+
+        if (!$result) {
             return response()->json(['message' => 'Email atau password salah'], 401);
         }
 
-        $user = User::where('email', $request->email)->firstOrFail();
-        $token = $user->createToken('auth_token')->plainTextToken;
-
         return response()->json([
             'message' => 'Login berhasil',
-            'access_token' => $token,
+            'access_token' => $result['token'],
             'token_type' => 'Bearer'
         ]);
     }
