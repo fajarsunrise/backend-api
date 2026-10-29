@@ -70,6 +70,52 @@ class ArticleApiTest extends TestCase
             'judul' => 'Judul Artikel Testing'
         ]);
     }
+
+    public function test_user_yang_sudah_login_bisa_mengubah_artikel(): void
+    {
+        // 1. Persiapan: Buat user dan 1 artikel awal di database
+        $user = User::factory()->create();
+        $article = Article::create([
+            'judul' => 'Judul Lama',
+            'konten' => 'Isi konten lama'
+        ]);
+
+        // Siapkan data perubahan
+        $payload = [
+            'judul' => 'Judul Telah Diperbarui'
+        ];
+
+        // 2. Tindakan: User login dan mengirim PUT request ke ID artikel tersebut
+        $response = $this->actingAs($user, 'sanctum')
+                         ->putJson('/api/articles/' . $article->id, $payload);
+
+        // 3. Verifikasi: Status 200 OK dan judul di database benar-benar berubah
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('articles', [
+            'id' => $article->id,
+            'judul' => 'Judul Telah Diperbarui'
+        ]);
+    }
+
+    public function test_user_yang_sudah_login_bisa_menghapus_artikel(): void
+    {
+        // 1. Persiapan: Buat user dan 1 artikel
+        $user = User::factory()->create();
+        $article = Article::create([
+            'judul' => 'Artikel Untuk Dihapus',
+            'konten' => 'Konten akan hilang'
+        ]);
+
+        // 2. Tindakan: User login dan mengirim DELETE request
+        $response = $this->actingAs($user, 'sanctum')
+                         ->deleteJson('/api/articles/' . $article->id);
+
+        // 3. Verifikasi: Status 200 OK dan data sudah tidak ada di database
+        $response->assertStatus(200);
+        $this->assertDatabaseMissing('articles', [
+            'id' => $article->id
+        ]);
+    }
 }
 
 
