@@ -5,7 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Article;
 use App\Services\ArticleService;
+use App\Http\Resources\ArticleResource;
+use App\Http\Requests\StoreArticleRequest;
+use App\Http\Requests\UpdateArticleRequest;
 use Illuminate\Http\Request;
+
 
 class ArticleController extends Controller
 {
@@ -20,34 +24,37 @@ class ArticleController extends Controller
     public function index()
     {
         $articles = $this->articleService->getAllArticles();
-        return response()->json($articles);
+// 2. Gunakan 'collection' karena data yang dikembalikan berjumlah banyak (array)
+        return ArticleResource::collection($articles);
     }
 
-    public function store(Request $request)
+// 3. Ganti 'Request $request' menjadi 'StoreArticleRequest $request'
+    public function store(StoreArticleRequest $request)
     {
-        $validated = $request->validate([
-            'judul' => 'required|string|max:255',
-            'konten' => 'required|string'
-        ]);
+        // $request->validated() otomatis mengambil data yang sudah lolos seleksi
+        $article = $this->articleService->createArticle($request->validated());
 
-        $article = $this->articleService->createArticle($validated);
-        return response()->json(['message' => 'Artikel berhasil dibuat', 'data' => $article], 201);
+        return response()->json([
+            'message' => 'Artikel berhasil dibuat',
+            'data' => new ArticleResource($article)
+        ], 201);
     }
 
     public function show(Article $article)
     {
-        return response()->json($article);
+// 3. Gunakan 'new' karena data yang dikembalikan hanya satu baris
+        return new ArticleResource($article);
     }
 
-    public function update(Request $request, Article $article)
+// 4. Ganti 'Request $request' menjadi 'UpdateArticleRequest $request'
+    public function update(UpdateArticleRequest $request, Article $article)
     {
-        $validated = $request->validate([
-            'judul' => 'sometimes|required|string|max:255',
-            'konten' => 'sometimes|required|string'
-        ]);
+        $updatedArticle = $this->articleService->updateArticle($article, $request->validated());
 
-        $updatedArticle = $this->articleService->updateArticle($article, $validated);
-        return response()->json(['message' => 'Artikel diperbarui', 'data' => $updatedArticle]);
+        return response()->json([
+            'message' => 'Artikel diperbarui',
+            'data' => new ArticleResource($updatedArticle)
+        ]);
     }
 
     public function destroy(Article $article)
