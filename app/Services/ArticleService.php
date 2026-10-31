@@ -8,7 +8,8 @@ class ArticleService
 {
     public function getAllArticles()
     {
-        return Article::all();
+// with('category') menarik data relasi secara efisien
+    return Article::with('category')->get();
     }
 
     public function createArticle(array $data)
