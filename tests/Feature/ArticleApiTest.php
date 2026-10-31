@@ -46,29 +46,31 @@ class ArticleApiTest extends TestCase
 
     public function test_user_yang_sudah_login_bisa_membuat_artikel_baru(): void
     {
-        // 1. Persiapan Data (Arrange)
-        // Buat 1 user palsu
-        $user = User::factory()->create();
+// 1. Persiapan Data (Arrange)
+    $user = User::factory()->create();
 
-        // Siapkan data artikel yang ingin dikirim (payload)
-        $payload = [
-            'judul' => 'Judul Artikel Testing',
-            'konten' => 'Ini adalah isi dari artikel testing otomatis.'
-        ];
+    // Buat 1 kategori palsu untuk pengujian
+    $category = \App\Models\Category::create(['nama_kategori' => 'Teknologi']);
 
-        // 2. Tindakan (Act)
-        // Login sebagai user tersebut, lalu kirim POST request beserta datanya
-        $response = $this->actingAs($user, 'sanctum')
-                         ->postJson('/api/articles', $payload);
+    // Siapkan payload dengan menyertakan category_id
+    $payload = [
+        'judul' => 'Judul Artikel Testing',
+        'konten' => 'Ini adalah isi dari artikel testing otomatis.',
+        'category_id' => $category->id
+    ];
 
-        // 3. Verifikasi (Assert)
-        // Pastikan API membalas dengan status 201 (Created)
-        $response->assertStatus(201);
+    // 2. Tindakan (Act)
+    $response = $this->actingAs($user, 'sanctum')
+                     ->postJson('/api/articles', $payload);
 
-        // Pastikan database benar-benar menyimpan artikel dengan judul tersebut
-        $this->assertDatabaseHas('articles', [
-            'judul' => 'Judul Artikel Testing'
-        ]);
+    // 3. Verifikasi (Assert)
+    $response->assertStatus(201);
+
+    // Pastikan database menyimpan artikel beserta relasi kategorinya
+    $this->assertDatabaseHas('articles', [
+        'judul' => 'Judul Artikel Testing',
+        'category_id' => $category->id
+    ]);
     }
 
     public function test_user_yang_sudah_login_bisa_mengubah_artikel(): void

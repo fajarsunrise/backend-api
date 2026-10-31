@@ -94,9 +94,21 @@ endpoints:
         exampleWasSpecified: true
         nullable: false
         deprecated: false
+      category_id:
+        custom: []
+        name: category_id
+        description: 'ID dari kategori (opsional).'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
     cleanBodyParameters:
       judul: 'Belajar API Laravel'
       konten: 'Ini adalah contoh konten artikel.'
+      category_id: 1
     fileParameters: []
     responses: []
     responseFields: []
@@ -242,9 +254,21 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      category_id:
+        custom: []
+        name: category_id
+        description: 'ID dari kategori (opsional).'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanBodyParameters:
       judul: 'Judul Direvisi'
       konten: consequatur
+      category_id: 1
     fileParameters: []
     responses: []
     responseFields: []

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\TagController;
 
 // Endpoint Publik (Bisa diakses siapa saja)
 Route::post('/register', [AuthController::class, 'register']);
@@ -40,6 +41,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Rute Kategori (Baru ditambahkan)
     Route::apiResource('categories', CategoryController::class);
+
+    // Rute Tag
+Route::apiResource('tags', TagController::class);
 });
 
 

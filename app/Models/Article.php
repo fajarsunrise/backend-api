@@ -14,4 +14,10 @@ class Article extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    // Artikel memiliki banyak (belongsToMany) Tag melalui tabel pivot
+public function tags()
+{
+    return $this->belongsToMany(Tag::class);
+}
 }

@@ -17,8 +17,10 @@ public function rules(): array
     return [
         'judul' => 'required|string|max:255',
         'konten' => 'required|string',
-        // Pastikan category_id berupa angka dan benar-benar ada di tabel categories
-        'category_id' => 'nullable|integer|exists:categories,id'
+        'category_id' => 'nullable|integer|exists:categories,id',
+        // Validasi untuk Tag
+        'tags' => 'nullable|array', // Harus berupa array (contoh: [1, 2, 3])
+        'tags.*' => 'integer|exists:tags,id' // Setiap isi array harus berupa angka dan ada di tabel tags
     ];
 }
 }

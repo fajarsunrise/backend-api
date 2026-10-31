@@ -50,6 +50,7 @@ class ArticleController extends Controller
      * @authenticated
      * @bodyParam judul string required Judul dari artikel. Example: Belajar API Laravel
      * @bodyParam konten string required Isi lengkap dari artikel. Example: Ini adalah contoh konten artikel.
+     * @bodyParam category_id integer ID dari kategori (opsional). Example: 1
      */
 
 // 3. Ganti 'Request $request' menjadi 'StoreArticleRequest $request'
@@ -88,6 +89,7 @@ class ArticleController extends Controller
      * @urlParam article integer required ID artikel. Example: 1
      * @bodyParam judul string Judul baru artikel. Example: Judul Direvisi
      * @bodyParam konten string Konten baru artikel.
+     * @bodyParam category_id integer ID dari kategori (opsional). Example: 1
      */
 
 // 4. Ganti 'Request $request' menjadi 'UpdateArticleRequest $request'
