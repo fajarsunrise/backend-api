@@ -16,8 +16,8 @@ endpoints:
         Endpoint untuk mengelola data artikel (CRUD).
       subgroup: ''
       subgroupDescription: ''
-      title: 'Dapatkan Semua Artikel'
-      description: 'Menampilkan daftar seluruh artikel yang ada di sistem.'
+      title: 'Dapatkan Daftar Artikel'
+      description: 'Mengambil semua data artikel dengan format pagination (10 data per halaman).'
       authenticated: true
       deprecated: false
     headers:
@@ -25,8 +25,32 @@ endpoints:
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
+    queryParameters:
+      search:
+        custom: []
+        name: search
+        description: 'Kata kunci pencarian berdasarkan judul atau konten.'
+        required: false
+        example: laravel
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      category_id:
+        custom: []
+        name: category_id
+        description: 'Filter berdasarkan ID Kategori tertentu.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanQueryParameters:
+      search: laravel
+      category_id: 1
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
@@ -103,10 +127,24 @@ endpoints:
         exampleWasSpecified: true
         nullable: true
         deprecated: false
+      tags:
+        custom: []
+        name: tags
+        description: 'Must match an existing stored value.'
+        required: false
+        example:
+          - 17
+        type: 'integer[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     cleanBodyParameters:
       judul: 'Belajar API Laravel'
       konten: 'Ini adalah contoh konten artikel.'
       category_id: 1
+      tags:
+        - 17
     fileParameters: []
     responses: []
     responseFields: []

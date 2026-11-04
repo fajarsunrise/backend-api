@@ -6,12 +6,20 @@ use App\Models\Article;
 
 class ArticleService
 {
-public function getAllArticles()
+public function getAllArticles($search = null, $categoryId = null)
 {
-    // Tarik data Kategori dan Tag sekaligus (Eager Loading) agar performa cepat
-    return Article::with(['category', 'tags'])->get();
+    return Article::with(['category', 'tags'])
+        // Jika ada pencarian, cari berdasarkan judul atau konten
+        ->when($search, function ($query, $search) {
+            return $query->where('judul', 'like', '%' . $search . '%')
+                         ->orWhere('konten', 'like', '%' . $search . '%');
+        })
+        // Jika ada filter kategori, cari yang ID kategorinya cocok
+        ->when($categoryId, function ($query, $categoryId) {
+            return $query->where('category_id', $categoryId);
+        })
+        ->paginate(10);
 }
-
 public function createArticle(array $data)
 {
     // Ambil data tags, lalu hapus dari array utama agar tidak error saat create artikel

@@ -27,20 +27,27 @@ class ArticleController extends Controller
         $this->articleService = $articleService;
     }
 
-    /**
-     * Dapatkan Semua Artikel
-     *
-     * Menampilkan daftar seluruh artikel yang ada di sistem.
-     *
-     * @authenticated
-     */
+/**
+ * Dapatkan Daftar Artikel
+ *
+ * Mengambil semua data artikel dengan format pagination (10 data per halaman).
+ *
+ * @authenticated
+ * @queryParam search string Kata kunci pencarian berdasarkan judul atau konten. Example: laravel
+ * @queryParam category_id integer Filter berdasarkan ID Kategori tertentu. Example: 1
+ */
 
-    public function index()
-    {
-        $articles = $this->articleService->getAllArticles();
-// 2. Gunakan 'collection' karena data yang dikembalikan berjumlah banyak (array)
-        return ArticleResource::collection($articles);
-    }
+public function index(Request $request)
+{
+    // Menangkap parameter ?search=... dan ?category_id=... dari URL
+    $search = $request->query('search');
+    $categoryId = $request->query('category_id');
+
+    // Mengirimkan parameter tersebut ke Service
+    $articles = $this->articleService->getAllArticles($search, $categoryId);
+
+    return ArticleResource::collection($articles);
+}
 
 /**
      * Buat Artikel Baru

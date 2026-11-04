@@ -44,34 +44,51 @@ class ArticleApiTest extends TestCase
         $response->assertStatus(401);
     }
 
-    public function test_user_yang_sudah_login_bisa_membuat_artikel_baru(): void
-    {
-// 1. Persiapan Data (Arrange)
+   public function test_user_yang_sudah_login_bisa_membuat_artikel_baru(): void
+{
+    // 1. Persiapan Data
     $user = User::factory()->create();
-
-    // Buat 1 kategori palsu untuk pengujian
     $category = \App\Models\Category::create(['nama_kategori' => 'Teknologi']);
 
-    // Siapkan payload dengan menyertakan category_id
+    // Buat 2 tag palsu
+    $tag1 = \App\Models\Tag::create(['nama_tag' => 'Laravel']);
+    $tag2 = \App\Models\Tag::create(['nama_tag' => 'Tutorial']);
+
+    // Siapkan payload dengan menyertakan category_id dan array tags
     $payload = [
-        'judul' => 'Judul Artikel Testing',
-        'konten' => 'Ini adalah isi dari artikel testing otomatis.',
-        'category_id' => $category->id
+        'judul' => 'Judul Artikel Many-to-Many',
+        'konten' => 'Isi konten ini terhubung ke kategori dan banyak tag.',
+        'category_id' => $category->id,
+        'tags' => [$tag1->id, $tag2->id] // Mengirimkan 2 ID tag sekaligus
     ];
 
-    // 2. Tindakan (Act)
+    // 2. Tindakan
     $response = $this->actingAs($user, 'sanctum')
                      ->postJson('/api/articles', $payload);
 
-    // 3. Verifikasi (Assert)
+    // 3. Verifikasi
     $response->assertStatus(201);
 
-    // Pastikan database menyimpan artikel beserta relasi kategorinya
+    // Cek tabel articles utama
     $this->assertDatabaseHas('articles', [
-        'judul' => 'Judul Artikel Testing',
+        'judul' => 'Judul Artikel Many-to-Many',
         'category_id' => $category->id
     ]);
-    }
+
+    // AMAT PENTING: Cek pivot table (article_tag) untuk memastikan relasi tersimpan!
+    // Karena response JSON mengembalikan id artikel yang baru dibuat di 'data.id_artikel'
+    $articleId = $response->json('data.id_artikel');
+
+    $this->assertDatabaseHas('article_tag', [
+        'article_id' => $articleId,
+        'tag_id' => $tag1->id
+    ]);
+
+    $this->assertDatabaseHas('article_tag', [
+        'article_id' => $articleId,
+        'tag_id' => $tag2->id
+    ]);
+}
 
     public function test_user_yang_sudah_login_bisa_mengubah_artikel(): void
     {
@@ -118,6 +135,55 @@ class ArticleApiTest extends TestCase
             'id' => $article->id
         ]);
     }
+
+    public function test_user_bisa_mencari_artikel_berdasarkan_judul_atau_konten(): void
+{
+    $user = User::factory()->create();
+    $category = \App\Models\Category::create(['nama_kategori' => 'Teknologi']);
+
+    // Buat 2 artikel dengan judul berbeda
+    \App\Models\Article::create(['judul' => 'Belajar Laravel API', 'konten' => 'Isi konten API', 'category_id' => $category->id]);
+    \App\Models\Article::create(['judul' => 'Tutorial React JS', 'konten' => 'Isi konten React', 'category_id' => $category->id]);
+
+    // Lakukan pencarian dengan kata kunci 'Laravel'
+    $response = $this->actingAs($user, 'sanctum')
+                     ->getJson('/api/articles?search=Laravel');
+
+    $response->assertStatus(200);
+
+    // Pastikan hanya 1 artikel yang dikembalikan (Laravel API)
+    $response->assertJsonCount(1, 'data');
+    $this->assertEquals('Belajar Laravel API', $response->json('data.0.judul_artikel'));
+}
+
+public function test_format_pagination_berjalan_dengan_benar(): void
+{
+    $user = User::factory()->create();
+    $category = \App\Models\Category::create(['nama_kategori' => 'Umum']);
+
+    // Buat 15 artikel secara massal menggunakan perulangan
+    for ($i = 1; $i <= 15; $i++) {
+        \App\Models\Article::create([
+            'judul' => "Artikel ke-$i",
+            'konten' => 'Konten testing',
+            'category_id' => $category->id
+        ]);
+    }
+
+    $response = $this->actingAs($user, 'sanctum')->getJson('/api/articles');
+
+    $response->assertStatus(200);
+
+    // Karena paginate(10), maka array 'data' hanya boleh berisi 10 item di halaman pertama
+    $response->assertJsonCount(10, 'data');
+
+    // Pastikan struktur JSON memiliki informasi meta dan links (tanda pagination aktif)
+    $response->assertJsonStructure([
+        'data',
+        'links' => ['first', 'last', 'prev', 'next'],
+        'meta' => ['current_page', 'last_page', 'per_page', 'total']
+    ]);
+}
 }
 
 
