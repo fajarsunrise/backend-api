@@ -60,7 +60,19 @@ public function index(Request $request)
      * @bodyParam category_id integer ID dari kategori (opsional). Example: 1
      */
 
-// 3. Ganti 'Request $request' menjadi 'StoreArticleRequest $request'
+/**
+ * Buat Artikel Baru
+ *
+ * Menyimpan artikel baru ke dalam database beserta relasi tag dan gambar sampul.
+ * Pastikan request dikirim menggunakan format multipart/form-data jika menyertakan gambar.
+ *
+ * @authenticated
+ * @bodyParam judul string required Judul artikel. Example: Belajar Laravel API
+ * @bodyParam konten string required Isi konten artikel. Example: Ini adalah panduan lengkap...
+ * @bodyParam category_id integer ID kategori dari artikel. Example: 1
+ * @bodyParam tags int[] Array berisi ID tag. Example: [1, 2]
+ * @bodyParam gambar_sampul file Gambar sampul artikel (Maks: 2MB, Format: jpeg, png, jpg, webp).
+ */
     public function store(StoreArticleRequest $request)
     {
         // $request->validated() otomatis mengambil data yang sudah lolos seleksi

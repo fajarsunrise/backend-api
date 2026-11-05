@@ -83,11 +83,13 @@ endpoints:
       subgroup: ''
       subgroupDescription: ''
       title: 'Buat Artikel Baru'
-      description: 'Menambahkan data artikel baru ke dalam database.'
+      description: |-
+        Menyimpan artikel baru ke dalam database beserta relasi tag dan gambar sampul.
+        Pastikan request dikirim menggunakan format multipart/form-data jika menyertakan gambar.
       authenticated: true
       deprecated: false
     headers:
-      Content-Type: application/json
+      Content-Type: multipart/form-data
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
@@ -97,9 +99,9 @@ endpoints:
       judul:
         custom: []
         name: judul
-        description: 'Judul dari artikel.'
+        description: 'Judul artikel.'
         required: true
-        example: 'Belajar API Laravel'
+        example: 'Belajar Laravel API'
         type: string
         enumValues: []
         exampleWasSpecified: true
@@ -108,9 +110,9 @@ endpoints:
       konten:
         custom: []
         name: konten
-        description: 'Isi lengkap dari artikel.'
+        description: 'Isi konten artikel.'
         required: true
-        example: 'Ini adalah contoh konten artikel.'
+        example: 'Ini adalah panduan lengkap...'
         type: string
         enumValues: []
         exampleWasSpecified: true
@@ -119,7 +121,7 @@ endpoints:
       category_id:
         custom: []
         name: category_id
-        description: 'ID dari kategori (opsional).'
+        description: 'ID kategori dari artikel.'
         required: false
         example: 1
         type: integer
@@ -130,22 +132,36 @@ endpoints:
       tags:
         custom: []
         name: tags
-        description: 'Must match an existing stored value.'
+        description: 'Array berisi ID tag.'
         required: false
         example:
-          - 17
+          - 1
+          - 2
         type: 'integer[]'
         enumValues: []
-        exampleWasSpecified: false
+        exampleWasSpecified: true
         nullable: false
         deprecated: false
+      gambar_sampul:
+        custom: []
+        name: gambar_sampul
+        description: 'Gambar sampul artikel (Maks: 2MB, Format: jpeg, png, jpg, webp).'
+        required: false
+        example: null
+        type: file
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
     cleanBodyParameters:
-      judul: 'Belajar API Laravel'
-      konten: 'Ini adalah contoh konten artikel.'
+      judul: 'Belajar Laravel API'
+      konten: 'Ini adalah panduan lengkap...'
       category_id: 1
       tags:
-        - 17
-    fileParameters: []
+        - 1
+        - 2
+    fileParameters:
+      gambar_sampul: null
     responses: []
     responseFields: []
     auth: []

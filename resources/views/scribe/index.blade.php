@@ -26,7 +26,7 @@
             </style>
 
     <script>
-        var tryItOutBaseUrl = "http://localhost";
+        var tryItOutBaseUrl = "https://api-artikel-portofolio.onrender.com";
         var useCsrf = Boolean();
         var csrfUrl = "/sanctum/csrf-cookie";
     </script>
@@ -157,7 +157,7 @@
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: November 4, 2026</li>
+        <li>Last updated: November 5, 2026</li>
     </ul>
 </div>
 
@@ -166,7 +166,7 @@
     <div class="content">
         <h1 id="introduction">Introduction</h1>
 <aside>
-    <strong>Base URL</strong>: <code>http://localhost</code>
+    <strong>Base URL</strong>: <code>https://api-artikel-portofolio.onrender.com</code>
 </aside>
 <pre><code>This documentation aims to provide all the information you need to work with our API.
 
@@ -193,14 +193,14 @@ You can switch the language used with the tabs at the top right (or from the nav
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/profil" \
+    --get "https://api-artikel-portofolio.onrender.com/api/profil" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/profil"
+    "https://api-artikel-portofolio.onrender.com/api/profil"
 );
 
 const headers = {
@@ -320,14 +320,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/tags" \
+    --get "https://api-artikel-portofolio.onrender.com/api/tags" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/tags"
+    "https://api-artikel-portofolio.onrender.com/api/tags"
 );
 
 const headers = {
@@ -447,7 +447,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/tags" \
+    "https://api-artikel-portofolio.onrender.com/api/tags" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -458,7 +458,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/tags"
+    "https://api-artikel-portofolio.onrender.com/api/tags"
 );
 
 const headers = {
@@ -579,14 +579,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/tags/17" \
+    --get "https://api-artikel-portofolio.onrender.com/api/tags/17" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/tags/17"
+    "https://api-artikel-portofolio.onrender.com/api/tags/17"
 );
 
 const headers = {
@@ -719,14 +719,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/tags/17" \
+    "https://api-artikel-portofolio.onrender.com/api/tags/17" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/tags/17"
+    "https://api-artikel-portofolio.onrender.com/api/tags/17"
 );
 
 const headers = {
@@ -847,14 +847,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/tags/17" \
+    "https://api-artikel-portofolio.onrender.com/api/tags/17" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/tags/17"
+    "https://api-artikel-portofolio.onrender.com/api/tags/17"
 );
 
 const headers = {
@@ -976,14 +976,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/articles?search=laravel&amp;category_id=1" \
+    --get "https://api-artikel-portofolio.onrender.com/api/articles?search=laravel&amp;category_id=1" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/articles"
+    "https://api-artikel-portofolio.onrender.com/api/articles"
 );
 
 const params = {
@@ -1128,7 +1128,8 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <small class="badge badge-darkred">requires authentication</small>
 </p>
 
-<p>Menambahkan data artikel baru ke dalam database.</p>
+<p>Menyimpan artikel baru ke dalam database beserta relasi tag dan gambar sampul.
+Pastikan request dikirim menggunakan format multipart/form-data jika menyertakan gambar.</p>
 
 <span id="example-requests-POSTapi-articles">
 <blockquote>Example request:</blockquote>
@@ -1136,43 +1137,37 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/articles" \
-    --header "Content-Type: application/json" \
+    "https://api-artikel-portofolio.onrender.com/api/articles" \
+    --header "Content-Type: multipart/form-data" \
     --header "Accept: application/json" \
-    --data "{
-    \"judul\": \"Belajar API Laravel\",
-    \"konten\": \"Ini adalah contoh konten artikel.\",
-    \"category_id\": 1,
-    \"tags\": [
-        17
-    ]
-}"
-</code></pre></div>
+    --form "judul=Belajar Laravel API"\
+    --form "konten=Ini adalah panduan lengkap..."\
+    --form "category_id=1"\
+    --form "tags[]=1"\
+    --form "gambar_sampul=@C:\Users\HP\AppData\Local\Temp\phpE99F.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/articles"
+    "https://api-artikel-portofolio.onrender.com/api/articles"
 );
 
 const headers = {
-    "Content-Type": "application/json",
+    "Content-Type": "multipart/form-data",
     "Accept": "application/json",
 };
 
-let body = {
-    "judul": "Belajar API Laravel",
-    "konten": "Ini adalah contoh konten artikel.",
-    "category_id": 1,
-    "tags": [
-        17
-    ]
-};
+const body = new FormData();
+body.append('judul', 'Belajar Laravel API');
+body.append('konten', 'Ini adalah panduan lengkap...');
+body.append('category_id', '1');
+body.append('tags[]', '1');
+body.append('gambar_sampul', document.querySelector('input[name="gambar_sampul"]').files[0]);
 
 fetch(url, {
     method: "POST",
     headers,
-    body: JSON.stringify(body),
+    body,
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
@@ -1197,7 +1192,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <form id="form-POSTapi-articles" data-method="POST"
       data-path="api/articles"
       data-authed="1"
-      data-hasfiles="0"
+      data-hasfiles="1"
       data-isarraybody="0"
       autocomplete="off"
       onsubmit="event.preventDefault(); executeTryOut('POSTapi-articles', this);">
@@ -1233,10 +1228,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="Content-Type"                data-endpoint="POSTapi-articles"
-               value="application/json"
+               value="multipart/form-data"
                data-component="header">
     <br>
-<p>Example: <code>application/json</code></p>
+<p>Example: <code>multipart/form-data</code></p>
             </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
@@ -1258,10 +1253,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="judul"                data-endpoint="POSTapi-articles"
-               value="Belajar API Laravel"
+               value="Belajar Laravel API"
                data-component="body">
     <br>
-<p>Judul dari artikel. Example: <code>Belajar API Laravel</code></p>
+<p>Judul artikel. Example: <code>Belajar Laravel API</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>konten</code></b>&nbsp;&nbsp;
@@ -1270,10 +1265,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="konten"                data-endpoint="POSTapi-articles"
-               value="Ini adalah contoh konten artikel."
+               value="Ini adalah panduan lengkap..."
                data-component="body">
     <br>
-<p>Isi lengkap dari artikel. Example: <code>Ini adalah contoh konten artikel.</code></p>
+<p>Isi konten artikel. Example: <code>Ini adalah panduan lengkap...</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>category_id</code></b>&nbsp;&nbsp;
@@ -1285,7 +1280,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                value="1"
                data-component="body">
     <br>
-<p>ID dari kategori (opsional). Example: <code>1</code></p>
+<p>ID kategori dari artikel. Example: <code>1</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>tags</code></b>&nbsp;&nbsp;
@@ -1299,7 +1294,19 @@ You can check the Dev Tools console for debugging information.</code></pre>
                name="tags[1]"                data-endpoint="POSTapi-articles"
                data-component="body">
     <br>
-<p>Must match an existing stored value.</p>
+<p>Array berisi ID tag.</p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>gambar_sampul</code></b>&nbsp;&nbsp;
+<small>file</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="file" style="display: none"
+                              name="gambar_sampul"                data-endpoint="POSTapi-articles"
+               value=""
+               data-component="body">
+    <br>
+<p>Gambar sampul artikel (Maks: 2MB, Format: jpeg, png, jpg, webp). Example: <code>C:\Users\HP\AppData\Local\Temp\phpE99F.tmp</code></p>
         </div>
         </form>
 
@@ -1317,14 +1324,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/articles/17" \
+    --get "https://api-artikel-portofolio.onrender.com/api/articles/17" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/articles/17"
+    "https://api-artikel-portofolio.onrender.com/api/articles/17"
 );
 
 const headers = {
@@ -1470,7 +1477,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/articles/17" \
+    "https://api-artikel-portofolio.onrender.com/api/articles/17" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -1483,7 +1490,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/articles/17"
+    "https://api-artikel-portofolio.onrender.com/api/articles/17"
 );
 
 const headers = {
@@ -1660,14 +1667,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/articles/17" \
+    "https://api-artikel-portofolio.onrender.com/api/articles/17" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/articles/17"
+    "https://api-artikel-portofolio.onrender.com/api/articles/17"
 );
 
 const headers = {
@@ -1800,14 +1807,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/categories" \
+    --get "https://api-artikel-portofolio.onrender.com/api/categories" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/categories"
+    "https://api-artikel-portofolio.onrender.com/api/categories"
 );
 
 const headers = {
@@ -1928,7 +1935,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/categories" \
+    "https://api-artikel-portofolio.onrender.com/api/categories" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -1939,7 +1946,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/categories"
+    "https://api-artikel-portofolio.onrender.com/api/categories"
 );
 
 const headers = {
@@ -2060,14 +2067,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/categories/17" \
+    --get "https://api-artikel-portofolio.onrender.com/api/categories/17" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/categories/17"
+    "https://api-artikel-portofolio.onrender.com/api/categories/17"
 );
 
 const headers = {
@@ -2201,7 +2208,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost/api/categories/17" \
+    "https://api-artikel-portofolio.onrender.com/api/categories/17" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -2212,7 +2219,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/categories/17"
+    "https://api-artikel-portofolio.onrender.com/api/categories/17"
 );
 
 const headers = {
@@ -2362,14 +2369,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost/api/categories/17" \
+    "https://api-artikel-portofolio.onrender.com/api/categories/17" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/categories/17"
+    "https://api-artikel-portofolio.onrender.com/api/categories/17"
 );
 
 const headers = {
@@ -2490,7 +2497,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/register" \
+    "https://api-artikel-portofolio.onrender.com/api/register" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -2503,7 +2510,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/register"
+    "https://api-artikel-portofolio.onrender.com/api/register"
 );
 
 const headers = {
@@ -2650,7 +2657,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/login" \
+    "https://api-artikel-portofolio.onrender.com/api/login" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -2662,7 +2669,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/login"
+    "https://api-artikel-portofolio.onrender.com/api/login"
 );
 
 const headers = {
