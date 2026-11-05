@@ -184,6 +184,43 @@ public function test_format_pagination_berjalan_dengan_benar(): void
         'meta' => ['current_page', 'last_page', 'per_page', 'total']
     ]);
 }
+
+public function test_user_bisa_mengunggah_gambar_saat_membuat_artikel(): void
+{
+    // PENTING: Gunakan storage palsu agar tidak mengotori folder asli saat testing
+    \Illuminate\Support\Facades\Storage::fake('public');
+
+    $user = \App\Models\User::factory()->create();
+
+    // Buat satu file gambar tiruan berukuran 1MB (1024 KB)
+    $gambarPalsu = \Illuminate\Http\UploadedFile::fake()->image('sampul.jpg')->size(1024);
+
+    $payload = [
+        'judul' => 'Artikel dengan Gambar',
+        'konten' => 'Ini kontennya.',
+        'gambar_sampul' => $gambarPalsu
+    ];
+
+    // Karena kita mengirim file, kita tidak bisa menggunakan postJson().
+    // Kita harus mengirim HTTP request biasa dengan format form-data.
+    $response = $this->actingAs($user, 'sanctum')
+                     ->post('/api/articles', $payload, [
+                         'Accept' => 'application/json' // Memaksa respon kembalian berupa JSON
+                     ]);
+
+    $response->assertStatus(201);
+
+    // Pastikan nama file tersimpan di database
+    $this->assertDatabaseHas('articles', [
+        'judul' => 'Artikel dengan Gambar'
+    ]);
+
+    // Ambil nama file dari database
+    $artikel = \App\Models\Article::where('judul', 'Artikel dengan Gambar')->first();
+
+    // Pastikan file tersebut benar-benar ada di dalam storage palsu
+    \Illuminate\Support\Facades\Storage::disk('public')->assertExists($artikel->gambar_sampul);
+}
 }
 
 
