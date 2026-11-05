@@ -24,4 +24,4 @@ COPY . .
 RUN composer install --optimize-autoloader
 
 # Jalankan server menggunakan port yang diberikan oleh Render
-CMD php artisan serve --host=0.0.0.0 --port=$PORT
+CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT
