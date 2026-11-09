@@ -15,7 +15,7 @@ public function toArray(Request $request): array
         'judul_artikel' => $this->judul,
         'isi_konten' => $this->konten,
         // Kembalikan URL utuh jika ada gambar, atau null jika tidak ada
-        'gambar_sampul' => $this->gambar_sampul ? asset('storage/' . $this->gambar_sampul) : null,
+        'gambar_sampul' => $this->gambar_sampul,
         'tags' => $this->tags->pluck('nama_tag'),
         'dibuat_pada' => $this->created_at->format('d F Y'),
     ];
