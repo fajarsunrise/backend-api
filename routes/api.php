@@ -2,49 +2,22 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\TagController;
 
-// Endpoint Publik (Bisa diakses siapa saja)
+// ==========================================
+// 1. ENDPOINT PUBLIK (Bisa diakses dari React tanpa login)
+// ==========================================
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// Endpoint Privat (Hanya bisa diakses jika memiliki token yang valid)
-Route::middleware('auth:sanctum')->get('/profil', function (Request $request) {
-    return response()->json([
-        'message' => 'Ini adalah data rahasia user',
-        'data' => $request->user()
-    ]);
-});
-
-// Route yang dilindungi
-Route::middleware('auth:sanctum')->group(function () {
-
-    // Rute profil sebelumnya
-    Route::get('/profil', function (Request $request) {
-        return $request->user();
-    });
-
-    // Mendaftarkan 5 rute CRUD sekaligus
-    Route::apiResource('articles', ArticleController::class);
-    });
-
-    Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/profil', function (Request $request) {
-        return $request->user();
-    });
-
-    // Rute Artikel
-    Route::apiResource('articles', ArticleController::class);
-
-    // Rute Kategori (Baru ditambahkan)
-    Route::apiResource('categories', CategoryController::class);
-
-    // Rute Tag
-Route::apiResource('tags', TagController::class);
-});
+// Mengizinkan React membaca data (index & show) untuk ditampilkan di portofolio
+Route::apiResource('articles', ArticleController::class)->only(['index', 'show']);
+Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
+Route::apiResource('tags', TagController::class)->only(['index', 'show']);
 
 Route::get('/clear-cache', function() {
     Artisan::call('config:clear');
@@ -52,4 +25,21 @@ Route::get('/clear-cache', function() {
     return response()->json(['message' => 'Cache berhasil dibersihkan! Silakan coba upload gambar lagi.']);
 });
 
+// ==========================================
+// 2. ENDPOINT PRIVAT (Ruang Admin - Membutuhkan Token Sanctum)
+// ==========================================
+Route::middleware('auth:sanctum')->group(function () {
 
+    Route::get('/profil', function (Request $request) {
+        return response()->json([
+            'message' => 'Ini adalah data rahasia user',
+            'data' => $request->user()
+        ]);
+    });
+
+    // Mengunci akses Tambah (store), Ubah (update), dan Hapus (destroy)
+    Route::apiResource('articles', ArticleController::class)->except(['index', 'show']);
+    Route::apiResource('categories', CategoryController::class)->except(['index', 'show']);
+    Route::apiResource('tags', TagController::class)->except(['index', 'show']);
+
+});
