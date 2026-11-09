@@ -1,35 +1,40 @@
 <?php
 
 namespace App\Services;
-use Illuminate\Support\Facades\Storage;
+
 use App\Models\Article;
+use Illuminate\Support\Facades\Storage;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class ArticleService
 {
-public function getAllArticles($search = null, $categoryId = null)
-{
-    return Article::with(['category', 'tags'])
-        // Jika ada pencarian, cari berdasarkan judul atau konten
-        ->when($search, function ($query, $search) {
-            return $query->where('judul', 'like', '%' . $search . '%')
-                         ->orWhere('konten', 'like', '%' . $search . '%');
-        })
-        // Jika ada filter kategori, cari yang ID kategorinya cocok
-        ->when($categoryId, function ($query, $categoryId) {
-            return $query->where('category_id', $categoryId);
-        })
-        ->paginate(10);
-}
-public function createArticle(array $data)
+    public function getAllArticles($search = null, $categoryId = null)
+    {
+        return Article::with(['category', 'tags'])
+            ->when($search, function ($query, $search) {
+                return $query->where('judul', 'like', '%' . $search . '%')
+                             ->orWhere('konten', 'like', '%' . $search . '%');
+            })
+            ->when($categoryId, function ($query, $categoryId) {
+                return $query->where('category_id', $categoryId);
+            })
+            ->paginate(10);
+    }
+
+    public function createArticle(array $data)
     {
         $tags = $data['tags'] ?? [];
         unset($data['tags']);
 
         // 1. Cek apakah ada file yang diunggah
         if (isset($data['gambar_sampul'])) {
-            // Simpan file ke folder storage/app/public/articles
-            // Simpan path-nya untuk dimasukkan ke database
-            $data['gambar_sampul'] = $data['gambar_sampul']->store('articles', 'public');
+            // Upload gambar ke Cloudinary di dalam folder 'articles'
+            $uploadedFileUrl = Cloudinary::upload($data['gambar_sampul']->getRealPath(), [
+                'folder' => 'articles'
+            ])->getSecurePath();
+
+            // Simpan URL aman (https) Cloudinary ke database
+            $data['gambar_sampul'] = $uploadedFileUrl;
         }
 
         $article = Article::create($data);
@@ -41,20 +46,23 @@ public function createArticle(array $data)
         return $article;
     }
 
-public function updateArticle(Article $article, array $data)
+    public function updateArticle(Article $article, array $data)
     {
         $tags = $data['tags'] ?? [];
         unset($data['tags']);
 
         // 1. Jika ada file gambar baru yang diunggah
         if (isset($data['gambar_sampul'])) {
-            // Hapus gambar lama secara fisik dari server agar hardisk tidak penuh
-            if ($article->gambar_sampul) {
-                Storage::disk('public')->delete($article->gambar_sampul);
-            }
+            // Catatan: Untuk skala portofolio, kita cukup menimpa URL di database.
+            // Penghapusan fisik di server Cloudinary membutuhkan ekstraksi public_id dari URL,
+            // yang bisa kita abaikan karena kapasitas gratis Cloudinary sangat besar.
 
-            // Simpan gambar baru
-            $data['gambar_sampul'] = $data['gambar_sampul']->store('articles', 'public');
+            // Upload gambar baru ke Cloudinary
+            $uploadedFileUrl = Cloudinary::upload($data['gambar_sampul']->getRealPath(), [
+                'folder' => 'articles'
+            ])->getSecurePath();
+
+            $data['gambar_sampul'] = $uploadedFileUrl;
         }
 
         $article->update($data);
@@ -66,17 +74,11 @@ public function updateArticle(Article $article, array $data)
         return $article;
     }
 
-public function deleteArticle(Article $article)
-{
-    // 1. Cek apakah artikel ini punya gambar sampul
-    if ($article->gambar_sampul) {
-        // 2. Hapus file fisik dari folder storage/app/public
-        Storage::disk('public')->delete($article->gambar_sampul);
+    public function deleteArticle(Article $article)
+    {
+        // Hapus data dari database (URL akan ikut terhapus dari tabel)
+        $article->delete();
+
+        return true;
     }
-
-    // 3. Hapus data dari database
-    $article->delete();
-
-    return true;
-}
 }
