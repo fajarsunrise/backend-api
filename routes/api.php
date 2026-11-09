@@ -46,4 +46,10 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::apiResource('tags', TagController::class);
 });
 
+Route::get('/clear-cache', function() {
+    Artisan::call('config:clear');
+    Artisan::call('cache:clear');
+    return response()->json(['message' => 'Cache berhasil dibersihkan! Silakan coba upload gambar lagi.']);
+});
+
 
