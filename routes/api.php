@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\TagController;
 use App\Http\Controllers\Api\ProjectController;
+use App\Http\Controllers\Api\CertificateController;
 
 // ==========================================
 // 1. ENDPOINT PUBLIK (Bisa diakses dari React tanpa login)
@@ -20,12 +21,21 @@ Route::apiResource('articles', ArticleController::class)->only(['index', 'show']
 Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
 Route::apiResource('tags', TagController::class)->only(['index', 'show']);
 Route::apiResource('projects', ProjectController::class)->only(['index', 'show']);
+Route::apiResource('certificates', CertificateController::class)->only(['index', 'show']);
 
 Route::get('/clear-cache', function() {
     Artisan::call('config:clear');
     Artisan::call('cache:clear');
     Artisan::call('route:clear');
     return response()->json(['message' => 'Cache dan routing berhasil dibersihkan! Silakan coba upload gambar lagi.']);
+});
+
+Route::get('/run-migrate', function() {
+    Artisan::call('migrate', ['--force' => true]);
+    return response()->json([
+        'message' => 'Migrasi database berhasil dijalankan!',
+        'output' => Artisan::output()
+    ]);
 });
 
 // ==========================================
@@ -45,5 +55,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('categories', CategoryController::class)->except(['index', 'show']);
     Route::apiResource('tags', TagController::class)->except(['index', 'show']);
     Route::apiResource('projects', ProjectController::class)->except(['index', 'show']);
+    Route::apiResource('certificates', CertificateController::class)->except(['index', 'show']);
 
 });
