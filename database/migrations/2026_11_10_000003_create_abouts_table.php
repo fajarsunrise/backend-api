@@ -13,14 +13,11 @@ return new class extends Migration
     {
         Schema::create('abouts', function (Blueprint $table) {
             $table->id();
-            $table->string('hero_greeting')->nullable();
-            $table->text('hero_description')->nullable();
-            $table->string('marquee_text')->nullable();
-            $table->text('about_bio')->nullable();
-            $table->string('years_experience')->nullable();
-            $table->string('projects_completed')->nullable();
+            $table->text('bio');
+            $table->string('years_experience');
+            $table->string('projects_completed');
             $table->string('profile_image_url')->nullable();
-            $table->string('contact_email')->nullable();
+            $table->string('contact_email');
             $table->timestamps();
         });
     }
@@ -33,4 +30,3 @@ return new class extends Migration
         Schema::dropIfExists('abouts');
     }
 };
-

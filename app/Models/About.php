@@ -12,14 +12,10 @@ class About extends Model
     protected $table = 'abouts';
 
     protected $fillable = [
-        'hero_greeting',
-        'hero_description',
-        'marquee_text',
-        'about_bio',
+        'bio',
         'years_experience',
         'projects_completed',
         'profile_image_url',
         'contact_email',
     ];
 }
-

@@ -9,8 +9,10 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\TagController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\CertificateController;
-use App\Http\Controllers\Api\AboutController;
 use App\Http\Controllers\Api\ToolController;
+use App\Http\Controllers\Api\HeroController;
+use App\Http\Controllers\Api\AboutController;
+use App\Http\Controllers\Api\ExperienceController;
 
 // ==========================================
 // 1. ENDPOINT PUBLIK (Bisa diakses dari React tanpa login)
@@ -25,19 +27,30 @@ Route::apiResource('tags', TagController::class)->only(['index', 'show']);
 Route::apiResource('projects', ProjectController::class)->only(['index', 'show']);
 Route::apiResource('certificates', CertificateController::class)->only(['index', 'show']);
 Route::apiResource('tools', ToolController::class)->only(['index', 'show']);
+Route::apiResource('experiences', ExperienceController::class)->only(['index', 'show']);
+
+Route::get('/hero', [HeroController::class, 'index']);
 Route::get('/about', [AboutController::class, 'index']);
 
 Route::get('/clear-cache', function() {
     Artisan::call('config:clear');
     Artisan::call('cache:clear');
     Artisan::call('route:clear');
-    return response()->json(['message' => 'Cache dan routing berhasil dibersihkan! Silakan coba upload gambar lagi.']);
+    return response()->json(['message' => 'Cache dan routing berhasil dibersihkan!']);
 });
 
 Route::get('/run-migrate', function() {
     Artisan::call('migrate', ['--force' => true]);
     return response()->json([
         'message' => 'Migrasi database berhasil dijalankan!',
+        'output' => Artisan::output()
+    ]);
+});
+
+Route::get('/run-migrate-fresh', function() {
+    Artisan::call('migrate:fresh', ['--force' => true]);
+    return response()->json([
+        'message' => 'Migrasi fresh database berhasil dijalankan!',
         'output' => Artisan::output()
     ]);
 });
@@ -61,6 +74,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('projects', ProjectController::class)->except(['index', 'show']);
     Route::apiResource('certificates', CertificateController::class)->except(['index', 'show']);
     Route::apiResource('tools', ToolController::class)->except(['index', 'show']);
+    Route::apiResource('experiences', ExperienceController::class)->except(['index', 'show']);
+
+    // Endpoint simpan / perbarui untuk Hero dan About
+    Route::post('/hero', [HeroController::class, 'update']);
     Route::post('/about', [AboutController::class, 'update']);
 
 });
