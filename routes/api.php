@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\TagController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\CertificateController;
+use App\Http\Controllers\Api\AboutController;
 
 // ==========================================
 // 1. ENDPOINT PUBLIK (Bisa diakses dari React tanpa login)
@@ -22,6 +23,7 @@ Route::apiResource('categories', CategoryController::class)->only(['index', 'sho
 Route::apiResource('tags', TagController::class)->only(['index', 'show']);
 Route::apiResource('projects', ProjectController::class)->only(['index', 'show']);
 Route::apiResource('certificates', CertificateController::class)->only(['index', 'show']);
+Route::get('/about', [AboutController::class, 'index']);
 
 Route::get('/clear-cache', function() {
     Artisan::call('config:clear');
@@ -56,5 +58,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('tags', TagController::class)->except(['index', 'show']);
     Route::apiResource('projects', ProjectController::class)->except(['index', 'show']);
     Route::apiResource('certificates', CertificateController::class)->except(['index', 'show']);
+    Route::post('/about', [AboutController::class, 'update']);
 
 });
