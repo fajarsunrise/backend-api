@@ -43,16 +43,23 @@ class ToolController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'icon' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
             'icon_url' => 'nullable|string|max:1000',
         ]);
 
-        // Upload file ikon ke Cloudinary jika ada
+        // Upload file ikon/gambar ke Cloudinary menggunakan standar yang sama dengan Project
         if ($request->hasFile('icon')) {
             $uploadedUrl = Cloudinary::upload($request->file('icon')->getRealPath(), [
                 'folder' => 'tools'
             ])->getSecurePath();
             $validated['icon_url'] = $uploadedUrl;
             unset($validated['icon']);
+        } elseif ($request->hasFile('image')) {
+            $uploadedUrl = Cloudinary::upload($request->file('image')->getRealPath(), [
+                'folder' => 'tools'
+            ])->getSecurePath();
+            $validated['icon_url'] = $uploadedUrl;
+            unset($validated['image']);
         } elseif ($request->hasFile('icon_url')) {
             $uploadedUrl = Cloudinary::upload($request->file('icon_url')->getRealPath(), [
                 'folder' => 'tools'
@@ -89,16 +96,23 @@ class ToolController extends Controller
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'icon' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
             'icon_url' => 'nullable|string|max:1000',
         ]);
 
-        // Upload file ikon baru ke Cloudinary jika ada
+        // Upload file ikon/gambar baru ke Cloudinary menggunakan standar yang sama dengan Project
         if ($request->hasFile('icon')) {
             $uploadedUrl = Cloudinary::upload($request->file('icon')->getRealPath(), [
                 'folder' => 'tools'
             ])->getSecurePath();
             $validated['icon_url'] = $uploadedUrl;
             unset($validated['icon']);
+        } elseif ($request->hasFile('image')) {
+            $uploadedUrl = Cloudinary::upload($request->file('image')->getRealPath(), [
+                'folder' => 'tools'
+            ])->getSecurePath();
+            $validated['icon_url'] = $uploadedUrl;
+            unset($validated['image']);
         } elseif ($request->hasFile('icon_url')) {
             $uploadedUrl = Cloudinary::upload($request->file('icon_url')->getRealPath(), [
                 'folder' => 'tools'
@@ -128,4 +142,3 @@ class ToolController extends Controller
         ], 200);
     }
 }
-
