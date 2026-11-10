@@ -30,6 +30,7 @@ Route::apiResource('tools', ToolController::class)->only(['index', 'show']);
 Route::apiResource('experiences', ExperienceController::class)->only(['index', 'show']);
 
 Route::get('/hero', [HeroController::class, 'index']);
+Route::get('/heroes', [HeroController::class, 'index']);
 Route::get('/about', [AboutController::class, 'index']);
 
 Route::get('/clear-cache', function() {
@@ -78,6 +79,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Endpoint simpan / perbarui untuk Hero dan About
     Route::post('/hero', [HeroController::class, 'update']);
+    Route::post('/heroes', [HeroController::class, 'update']);
     Route::post('/about', [AboutController::class, 'update']);
 
 });
