@@ -15,6 +15,25 @@ use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 class ProjectController extends Controller
 {
     /**
+     * Helper untuk memformat URL gambar agar selalu lengkap dan valid
+     */
+    private function formatImageUrl(?string $imageUrl): string
+    {
+        if (empty($imageUrl)) {
+            return '';
+        }
+
+        // Jika sudah berupa URL absolut (Cloudinary / http / https / data:), kembalikan langsung
+        if (str_starts_with($imageUrl, 'http://') || str_starts_with($imageUrl, 'https://') || str_starts_with($imageUrl, 'data:')) {
+            return $imageUrl;
+        }
+
+        // Jika berupa relative path penyimpanan lokal, ubah menjadi URL absolut menggunakan url()
+        $cleanPath = ltrim(str_replace('storage/', '', $imageUrl), '/');
+        return url('storage/' . $cleanPath);
+    }
+
+    /**
      * Dapatkan Daftar Projek
      *
      * Mengambil semua daftar projek portofolio (bisa difilter dengan kata kunci pencarian).
@@ -28,7 +47,11 @@ class ProjectController extends Controller
                              ->orWhere('description', 'like', '%' . $search . '%');
             })
             ->latest()
-            ->get();
+            ->get()
+            ->map(function ($project) {
+                $project->image_url = $this->formatImageUrl($project->image_url);
+                return $project;
+            });
 
         return response()->json([
             'message' => 'Daftar projek berhasil diambil',
@@ -40,7 +63,7 @@ class ProjectController extends Controller
      * Buat Projek Baru
      *
      * Menyimpan data projek baru ke dalam database.
-     * Mendukung upload file gambar langsung ke Cloudinary atau URL gambar eksternal.
+     * Mendukung upload file gambar langsung ke Cloudinary atau fallback lokal.
      *
      * @authenticated
      */
@@ -55,19 +78,45 @@ class ProjectController extends Controller
             'demo_link' => 'nullable|string|max:500',
         ]);
 
-        // 1. Cek jika ada file gambar yang diunggah -> upload ke Cloudinary
-        if ($request->hasFile('image')) {
-            $uploadedUrl = Cloudinary::upload($request->file('image')->getRealPath(), [
-                'folder' => 'projects'
-            ])->getSecurePath();
-            $validated['image_url'] = $uploadedUrl;
+        $imageUrl = null;
+
+        // 1. Pengecekan File Gambar:
+        // HANYA jalankan proses upload jika ada file gambar fisik yang benar-benar diunggah dan valid
+        if ($request->hasFile('image') && $request->file('image')->isValid()) {
+            $imageFile = $request->file('image');
+            try {
+                // Cek ketersediaan konfigurasi Cloudinary
+                if (env('CLOUDINARY_URL') || config('cloudinary.cloud_url')) {
+                    $uploaded = Cloudinary::upload($imageFile->getRealPath(), [
+                        'folder' => 'projects'
+                    ]);
+                    $uploadedUrl = $uploaded ? $uploaded->getSecurePath() : null;
+                    if ($uploadedUrl) {
+                        $imageUrl = $uploadedUrl;
+                    } else {
+                        throw new \Exception("Gagal memperoleh URL dari Cloudinary");
+                    }
+                } else {
+                    // Simpan ke storage lokal jika Cloudinary tidak dikonfigurasi
+                    $path = $imageFile->store('projects', 'public');
+                    $imageUrl = url('storage/' . $path);
+                }
+            } catch (\Throwable $e) {
+                // Fallback aman ke penyimpanan lokal jika Cloudinary error untuk cegah error 500
+                try {
+                    $path = $imageFile->store('projects', 'public');
+                    $imageUrl = url('storage/' . $path);
+                } catch (\Throwable $storageErr) {
+                    $imageUrl = null;
+                }
+            }
             unset($validated['image']);
-        } elseif ($request->hasFile('image_url')) {
-            $uploadedUrl = Cloudinary::upload($request->file('image_url')->getRealPath(), [
-                'folder' => 'projects'
-            ])->getSecurePath();
-            $validated['image_url'] = $uploadedUrl;
+        } elseif ($request->filled('image_url')) {
+            $imageUrl = $request->input('image_url');
         }
+
+        $validated['image_url'] = $imageUrl;
+        unset($validated['image']);
 
         // 2. Normalisasi format technologies (bisa array, string JSON, atau koma)
         if (isset($validated['technologies'])) {
@@ -82,6 +131,7 @@ class ProjectController extends Controller
         }
 
         $project = Project::create($validated);
+        $project->image_url = $this->formatImageUrl($project->image_url);
 
         return response()->json([
             'message' => 'Projek berhasil dibuat',
@@ -96,6 +146,8 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
+        $project->image_url = $this->formatImageUrl($project->image_url);
+
         return response()->json([
             'message' => 'Detail projek berhasil diambil',
             'data' => $project
@@ -120,21 +172,51 @@ class ProjectController extends Controller
             'demo_link' => 'nullable|string|max:500',
         ]);
 
-        // Cek jika ada unggahan gambar baru
-        if ($request->hasFile('image')) {
-            $uploadedUrl = Cloudinary::upload($request->file('image')->getRealPath(), [
-                'folder' => 'projects'
-            ])->getSecurePath();
-            $validated['image_url'] = $uploadedUrl;
+        // 1. Pengecekan File Gambar:
+        // HANYA jalankan proses upload jika ada file gambar baru yang benar-benar diunggah dan valid
+        if ($request->hasFile('image') && $request->file('image')->isValid()) {
+            $imageFile = $request->file('image');
+            try {
+                if (env('CLOUDINARY_URL') || config('cloudinary.cloud_url')) {
+                    $uploaded = Cloudinary::upload($imageFile->getRealPath(), [
+                        'folder' => 'projects'
+                    ]);
+                    $uploadedUrl = $uploaded ? $uploaded->getSecurePath() : null;
+                    if ($uploadedUrl) {
+                        $validated['image_url'] = $uploadedUrl;
+                    } else {
+                        throw new \Exception("Gagal memperoleh URL dari Cloudinary");
+                    }
+                } else {
+                    $path = $imageFile->store('projects', 'public');
+                    $validated['image_url'] = url('storage/' . $path);
+                }
+            } catch (\Throwable $e) {
+                // Fallback aman ke penyimpanan lokal jika Cloudinary gagal untuk cegah error 500
+                try {
+                    $path = $imageFile->store('projects', 'public');
+                    $validated['image_url'] = url('storage/' . $path);
+                } catch (\Throwable $storageErr) {
+                    // Jika penyimpanan lokal gagal, pertahankan gambar lama jika ada, atau null
+                    $validated['image_url'] = $project->image_url ?? null;
+                }
+            }
             unset($validated['image']);
-        } elseif ($request->hasFile('image_url')) {
-            $uploadedUrl = Cloudinary::upload($request->file('image_url')->getRealPath(), [
-                'folder' => 'projects'
-            ])->getSecurePath();
-            $validated['image_url'] = $uploadedUrl;
+        } else {
+            // 2. Pertahankan Gambar Lama:
+            // Jika request tidak memiliki file gambar baru, abaikan proses upload dan jangan ubah/timpa image_url yang sudah ada
+            unset($validated['image']);
+
+            if ($request->filled('image_url')) {
+                $validated['image_url'] = $request->input('image_url');
+            } elseif ($project->image_url) {
+                $validated['image_url'] = $project->image_url;
+            } else {
+                unset($validated['image_url']);
+            }
         }
 
-        // Normalisasi format technologies
+        // 3. Normalisasi format technologies
         if (isset($validated['technologies'])) {
             if (is_string($validated['technologies'])) {
                 $decoded = json_decode($validated['technologies'], true);
@@ -147,6 +229,8 @@ class ProjectController extends Controller
         }
 
         $project->update($validated);
+        $project->refresh();
+        $project->image_url = $this->formatImageUrl($project->image_url);
 
         return response()->json([
             'message' => 'Projek berhasil diperbarui',
@@ -170,4 +254,3 @@ class ProjectController extends Controller
         ], 200);
     }
 }
-

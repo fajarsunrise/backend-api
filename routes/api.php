@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\ToolController;
 use App\Http\Controllers\Api\HeroController;
 use App\Http\Controllers\Api\AboutController;
 use App\Http\Controllers\Api\ExperienceController;
+use App\Http\Controllers\Api\ContactMessageController;
 
 // ==========================================
 // 1. ENDPOINT PUBLIK (Bisa diakses dari React tanpa login)
@@ -32,6 +33,24 @@ Route::apiResource('experiences', ExperienceController::class)->only(['index', '
 Route::get('/hero', [HeroController::class, 'index']);
 Route::get('/heroes', [HeroController::class, 'index']);
 Route::get('/about', [AboutController::class, 'index']);
+
+// Form Kontak Publik
+Route::post('/messages', [ContactMessageController::class, 'store']);
+
+// Endpoint aman untuk serving media storage dengan header CORS lengkap
+Route::get('/media/{path}', function ($path) {
+    $filePath = storage_path('app/public/' . $path);
+    if (!file_exists($filePath)) {
+        abort(404);
+    }
+    $file = file_get_contents($filePath);
+    $type = mime_content_type($filePath) ?: 'image/jpeg';
+    return response($file, 200, [
+        'Content-Type' => $type,
+        'Access-Control-Allow-Origin' => '*',
+        'Access-Control-Allow-Methods' => 'GET, OPTIONS',
+    ]);
+})->where('path', '.*');
 
 Route::get('/clear-cache', function() {
     Artisan::call('config:clear');
@@ -81,5 +100,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/hero', [HeroController::class, 'update']);
     Route::post('/heroes', [HeroController::class, 'update']);
     Route::post('/about', [AboutController::class, 'update']);
+
+    // Manajemen Pesan Masuk (Inbox)
+    Route::get('/messages', [ContactMessageController::class, 'index']);
+    Route::delete('/messages/{id}', [ContactMessageController::class, 'destroy']);
 
 });

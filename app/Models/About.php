@@ -15,6 +15,7 @@ class About extends Model
         'bio',
         'years_experience',
         'projects_completed',
+        'gpa',
         'profile_image_url',
         'contact_email',
     ];
